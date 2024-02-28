@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 export function authMiddleware(req:Request,res:Response,next:NextFunction){
     try {
         const authHeader = req.headers.authorization;
-
+        
         if(!authHeader || !authHeader.startsWith('Bearer ')){
             return res.status(404).json({
                 message:"Authorization header not found"
@@ -11,8 +11,8 @@ export function authMiddleware(req:Request,res:Response,next:NextFunction){
         }else{
         
         const token = authHeader.split(' ')[1];    
-
-        const decoded = jwt.decode(token);
+        const SECRET = process.env.SECRET;
+        const decoded = jwt.verify(token, SECRET!);
         if(!decoded){
             res.json({
                 message:"You are not authenticated"
@@ -20,8 +20,8 @@ export function authMiddleware(req:Request,res:Response,next:NextFunction){
             return;
         }else{
             //@ts-ignore
-            res.setHeader("userId", decoded);
-            console.log("Authentication Successfull");
+            req.id = Number(decoded);
+            console.log("Authentication Successfull",decoded);
             next();
         }
     }

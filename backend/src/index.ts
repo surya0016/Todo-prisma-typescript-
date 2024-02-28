@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import * as dotenv from 'dotenv';
 import cors from 'cors';
-import {z} from 'zod';
+import {number, z} from 'zod';
 
 dotenv.config();
 
@@ -34,9 +34,7 @@ const createUser = async (req:Request, res:Response) => {
         })
         
         const userId = user.id;
-        //@ts-ignore
-        const token = jwt.sign(userId, SECRET);
-        // localStorage.setItem("token", token);
+        const token = jwt.sign(`${userId}`, SECRET!);
         console.log(user);
         res.json({
             message:"User Created Successfully",
@@ -139,10 +137,7 @@ app.post('/api/v1/signin',async(req:Request, res:Response)=>{
         }
 
         const userId = user!.id;
-        //@ts-ignore
-        const token = jwt.sign(userId, SECRET);
-        // req.headers.authorization = token
-        // localStorage.setItem("token", token);
+        const token = jwt.sign(`${userId}`, SECRET!);
         res.json({
             message:"Signin Successfull",
             success:true,
@@ -162,7 +157,8 @@ app.post('/api/v1/signin',async(req:Request, res:Response)=>{
 
 app.get('/api/v1/todo',authMiddleware, async(req:Request, res:Response)=>{
     try {
-        const id = Number(res.getHeader("userId"));
+        //@ts-ignore
+        const id = req.id;
         const todo = await prisma.todo.findMany({
             where:{
                 userId:id
@@ -182,16 +178,15 @@ app.get('/api/v1/todo',authMiddleware, async(req:Request, res:Response)=>{
 })
 
 app.post('/api/v1/todo',authMiddleware,async(req:Request, res:Response)=>{
-    const userId = Number(res.getHeader("userId"));
+    //@ts-ignore
+    const userId = req.id;
     const title = req.body.title;
-    const description = req.body.description;
 
     const setTodo = async () => {
         try {
             const todo = await prisma.todo.create({
                 data:{
                     title,
-                    description,
                     userId,
                 }
             })
@@ -212,13 +207,16 @@ setTodo();
 
 app.get('/api/v1/todo/:id',authMiddleware,async(req:Request, res:Response)=>{
     try {
+        //@ts-ignore
+        const userId = req.id;
         const id = Number(req.params.id);
         const todo = await prisma.todo.findFirst({
             where:{
-                id:id,
+                userId,
+                id
             }
         })
-        console.log(todo);
+        console.log(id,userId,todo);
         res.json({
             todo
         })
@@ -235,14 +233,12 @@ app.put('/api/v1/updatetodo/:id',async(req:Request, res:Response)=>{
     try {
         const id = Number(req.params.id);
         const title = req.body.title;
-        const description = req.body.description;
         const updateTodo = await prisma.todo.update({
             where:{
                 id:id
             },
             data:{
                 title,
-                description
             }
         })
         console.log(updateTodo);
@@ -262,15 +258,20 @@ app.put('/api/v1/updatetodo/:id',async(req:Request, res:Response)=>{
 app.put('/api/v1/marktodo/:id', async (req:Request, res:Response)=>{
     try {
         const todoId = Number(req.params.id);
+        const checkDone = await prisma.todo.findFirst({
+            where:{
+                id:todoId
+            }
+        });
         const updateDone = await prisma.todo.update({
             where:{
                 id:todoId,
             },
             data:{
-                done:true,
+                done:!checkDone!.done,
             }
         })
-    res.json({done:true, todo:updateDone})
+    res.json({done:checkDone?.done, todo:updateDone})
     } catch (error) {
         console.log(error);
         res.json({
