@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import * as dotenv from 'dotenv';
 import cors from 'cors';
 import {z} from 'zod';
-import { decode, sign } from "jsonwebtoken";
 
 dotenv.config();
 
@@ -162,15 +161,24 @@ app.post('/api/v1/signin',async(req:Request, res:Response)=>{
 
 
 app.get('/api/v1/todo',authMiddleware, async(req:Request, res:Response)=>{
-    const id = Number(res.getHeader("userId"));
-    const todo = await prisma.todo.findMany({
-        where:{
-            userId:id
-        }
-    })
-    res.json({
-        todo:todo
-    })
+    try {
+        const id = Number(res.getHeader("userId"));
+        const todo = await prisma.todo.findMany({
+            where:{
+                userId:id
+            }
+        })
+        res.json({
+            todo:todo
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            error:error
+        })
+    }
+    
 })
 
 app.post('/api/v1/todo',authMiddleware,async(req:Request, res:Response)=>{
@@ -198,19 +206,98 @@ app.post('/api/v1/todo',authMiddleware,async(req:Request, res:Response)=>{
         }
         
     }
-    setTodo();
+setTodo();
+    
 })
 
-app.get('/api/v1/todo/:id',async(req:Request, res:Response)=>{
-
+app.get('/api/v1/todo/:id',authMiddleware,async(req:Request, res:Response)=>{
+    try {
+        const id = Number(req.params.id);
+        const todo = await prisma.todo.findFirst({
+            where:{
+                id:id,
+            }
+        })
+        console.log(todo);
+        res.json({
+            todo
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            error:error
+        })
+    }  
 })
 
-app.put('/api/v1/todo/:id',async(req:Request, res:Response)=>{
+app.put('/api/v1/updatetodo/:id',async(req:Request, res:Response)=>{
+    try {
+        const id = Number(req.params.id);
+        const title = req.body.title;
+        const description = req.body.description;
+        const updateTodo = await prisma.todo.update({
+            where:{
+                id:id
+            },
+            data:{
+                title,
+                description
+            }
+        })
+        console.log(updateTodo);
+        res.json({
+            message:"Todo updated",
+            todo:updateTodo
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            error:error
+        })
+    }    
+})
 
+app.put('/api/v1/marktodo/:id', async (req:Request, res:Response)=>{
+    try {
+        const todoId = Number(req.params.id);
+        const updateDone = await prisma.todo.update({
+            where:{
+                id:todoId,
+            },
+            data:{
+                done:true,
+            }
+        })
+    res.json({done:true, todo:updateDone})
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            error:error
+        })
+    }
 })
 
 app.delete('/api/v1/todo/:id',async(req:Request, res:Response)=>{
-
+    try {
+        const todoId = Number(req.params.id);
+        const deleteTodo = await prisma.todo.delete({
+            where:{
+                id:todoId
+            }
+        });
+        res.json({
+            message:"Todo deleted"
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            error:error
+        })
+    }
 })
 
 app.listen(PORT, ()=>console.log(`Server listening on port ${PORT}`));
