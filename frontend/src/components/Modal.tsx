@@ -5,7 +5,7 @@ import { useMyContext } from '../context/Context';
 
 function Modal(props:any) {
     const [todo, setTodo] = useState("");
-    const {value, updateValue} = useMyContext();
+    const { updateValue} = useMyContext();
 
     const inref = useRef(null);
     async function editTodo(e:any){
