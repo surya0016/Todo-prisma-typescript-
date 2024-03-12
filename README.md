@@ -4,7 +4,11 @@
 - Backend - Express Prisma Zod
 
 # Video
-https://github.com/surya0016/Todo-prisma-typescript-/assets/108184916/cfe4d592-ebc4-40c5-a8ee-8ff137430bdc
+
+
+https://github.com/surya0016/Todo-prisma-typescript-/assets/108184916/cc30b668-9658-4d3e-a297-04480cf4e3dc
+
+
 
 
 # How to setup the project locally
