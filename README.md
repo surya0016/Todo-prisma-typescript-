@@ -1,7 +1,11 @@
 # Todo App 
 - Fullstack todo app
 - Frontent - React and Tailwind
-- Backend - Express Prisma Zod 
+- Backend - Express Prisma Zod
+
+# Video
+https://github.com/surya0016/Todo-prisma-typescript-/assets/108184916/cfe4d592-ebc4-40c5-a8ee-8ff137430bdc
+
 
 # How to setup the project locally
 
@@ -14,7 +18,7 @@
 - Install the node packages
 >npm i
 
->node index.js
+>node dist/index.js
 
 - Then do the same in frontend file
 >cd ../frontend
