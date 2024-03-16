@@ -14,20 +14,25 @@ https://github.com/surya0016/Todo-prisma-typescript-/assets/108184916/cc30b668-9
 # How to setup the project locally
 
 - Clone it in using repo link
->git clone https://github.com/surya0016/Todo-prisma-typescript-.git .
-
+```
+git clone https://github.com/surya0016/Todo-prisma-typescript-.git .
+```
 - Go to the backend file
->cd backend
-
+```
+cd backend
+```
 - Install the node packages
->npm i
-
->node dist/index.js
+```
+npm i
+node dist/index.js
+```
 
 - Then do the same in frontend file
->cd ../frontend
-
+```
+cd ../frontend
+```
 - Install node packages in the frontend file
->npm i
-
->npm run dev
+```
+npm i
+npm run dev
+```
